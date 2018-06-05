@@ -105,13 +105,11 @@ public class HandsOnDemo {
 	}
 
 	private static Directory newDirectory() throws IOException {
-		// return new RAMDirectory();
-		return FSDirectory.open(new File("d:/tmp/ir-class/demo").toPath());
+	//	return new RAMDirectory();
+	return FSDirectory.open(new File("d:/tmp/ir-class/demo").toPath());
 	}
 
 	private static Analyzer newAnalyzer() {
-		// return new WhitespaceAnalyzer();
-		// return new StandardAnalyzer();
 		return new EnglishAnalyzer();
 	}
 

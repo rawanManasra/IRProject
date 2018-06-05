@@ -22,13 +22,14 @@ import java.util.List;
 import java.util.Map;
 
 public class Passage {
-	// class pasag
 	private String docID;
 	private double docScore;
 	private double score;
 	private int startOffset;
 	private int endOffset;
 	private String text;
+	// hash map that the key is the term, and value is an array list with the
+	// offsets' of the key
 	private final Map<String, List<Interval>> queryTerms = new HashMap<>();
 
 	public String getDocID() {
@@ -89,7 +90,17 @@ public class Passage {
 		return queryTerms;
 	}
 
+	/**
+	 * 
+	 * @param term:
+	 *            given term to process.
+	 * @param offsets:
+	 *            the offset of the term (start,end).
+	 * @return the current object after modification.
+	 */
 	public Passage addTerm(String term, Interval offsets) {
+		// get all offsets where term exists, if it does not exist so create new list
+		// and add the offset to it.
 		List<Interval> termOffsets = queryTerms.get(term);
 		if (termOffsets == null) {
 			termOffsets = new ArrayList<>();
@@ -99,6 +110,11 @@ public class Passage {
 		return this;
 	}
 
+	/**
+	 * 
+	 * declaring an interval by the start and the end offsets of a term.
+	 *
+	 */
 	public static class Interval {
 		public final int start;
 		public final int end;

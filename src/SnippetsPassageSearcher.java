@@ -60,7 +60,6 @@ public class SnippetsPassageSearcher implements PassageSearcher {
 		this.highlighter = new FastVectorHighlighter();
 	}
 
-	@SuppressWarnings("resource")
 	@Override
 	public List<Passage> search(Query query, TopDocs topDocs, int numPassages, int passageLength) throws IOException {
 		// Generate candidate passages.
@@ -71,6 +70,7 @@ public class SnippetsPassageSearcher implements PassageSearcher {
 			final Document doc = searcher.doc(sd.doc);
 			final String docID = doc.get("id");
 			final String text = doc.get("body");
+			//
 			final String[] snippets = highlighter.getBestFragments(fieldQuery, reader, sd.doc, field, passageLength,
 					numSnippetsPerDoc);
 			for (final String snippet : snippets) {
@@ -82,7 +82,6 @@ public class SnippetsPassageSearcher implements PassageSearcher {
 				candidatePassages.add(passage);
 			}
 		}
-
 		// Score and sort the passages.
 		passageScorer.score(candidatePassages);
 		Collections.sort(candidatePassages, PassageScorer.PASSAGE_COMPARATOR);
@@ -90,18 +89,28 @@ public class SnippetsPassageSearcher implements PassageSearcher {
 		// Return the top-scoring passages.
 		return candidatePassages.stream().limit(numPassages).collect(Collectors.toList());
 	}
-
+/**
+ * 
+ * @param snippet 
+ * @param passage
+ * @return
+ */
 	private static String extractHighlightedTerms(String snippet, Passage passage) {
 		final StringBuilder sb = new StringBuilder();
+		//get the start offset of the highlighted term <b> is for bold tag
 		int idx = snippet.indexOf("<b>");
 		int start = 0;
 		while (idx != -1) {
+			//add the string that was before the highlighting.
 			sb.append(snippet.substring(start, idx));
+			//find the end of the highlighting term by finding </b>
 			final int end = snippet.indexOf("</b>", idx + 3);
 			if (end == -1) {
 				throw new IllegalStateException("Unbalanced highlighting tags: " + snippet);
 			}
+			//add the highlighted term to the return value
 			sb.append(snippet.substring(idx + 3, end));
+			//
 			passage.addTerm(snippet.substring(idx + 3, end), new Passage.Interval(idx + 3, end));
 			idx = snippet.indexOf("<b>", end + 4);
 			start = end + 4;
